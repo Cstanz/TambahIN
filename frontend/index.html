@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catatan Uang</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+
+  <!-- Peringatan: hanya tampil kalau budget belum diisi / lewat jadwal (renderPeringatan) -->
+  <section id="peringatan" class="kotak peringatan" role="alert" hidden>
+    <span id="peringatan-teks"></span>
+    <button class="tombol kecil" type="button" id="tombol-isi-budget">Isi budget</button>
+  </section>
+
+  <!-- Sisa budget: selalu terlihat. Isinya diisi oleh app.js (renderBudget). -->
+  <section id="kartu-budget" class="kotak budget" aria-label="Sisa budget">
+    <div class="label" id="b-label">Memuat...</div>
+    <div class="angka" id="b-angka">Rp0</div>
+    <div class="bar" id="b-bar" role="img" aria-label="Sisa budget"><i id="b-isi"></i></div>
+    <div class="rincian"><span id="b-jatah"></span><span id="b-terpakai"></span></div>
+    <div class="rincian"><span id="b-asal"></span></div>
+  </section>
+
+  <!-- Isi budget -->
+  <section class="kotak">
+    <details id="isi-budget">
+      <summary>Isi budget</summary>
+      <form id="form-budget" autocomplete="off">
+        <label for="bg-nominal">Nominal (contoh: 200rb)</label>
+        <input type="text" id="bg-nominal" maxlength="20" required>
+        <label for="bg-tanggal">Tanggal uang diterima</label>
+        <input type="date" id="bg-tanggal" required>
+        <label for="bg-sumber">Dari mana (boleh kosong)</label>
+        <input type="text" id="bg-sumber" maxlength="60" placeholder="ortu, beasiswa, ...">
+        <fieldset class="pilihan">
+          <legend>Ini untuk</legend>
+          <label><input type="radio" name="bg-mode" value="baru" checked> Minggu baru</label>
+          <label><input type="radio" name="bg-mode" value="tambah"> Tambahan minggu ini</label>
+        </fieldset>
+        <button class="tombol" type="submit" id="tombol-budget">Simpan budget</button>
+      </form>
+    </details>
+  </section>
+
+  <!-- Chat -->
+  <section class="kotak">
+    <form id="form-chat" autocomplete="off">
+      <label for="chat">Catat apa hari ini?</label>
+      <input type="text" id="chat" placeholder="contoh: nasi + es teh 17k" maxlength="200">
+      <button class="tombol" type="submit" id="tombol-catat">Catat</button>
+      <p id="pesan" class="konfirmasi" role="status" aria-live="polite" hidden></p>
+    </form>
+    <div id="konfirmasi-budget" class="konfirmasi-budget"></div>
+  </section>
+
+  <!-- Daftar transaksi -->
+  <section class="kotak">
+    <h2>Transaksi periode ini</h2>
+    <p id="kosong" class="meta" hidden>Belum ada transaksi.</p>
+    <ul id="daftar" class="daftar"></ul>
+  </section>
+
+  <!-- Saran minggu ini -->
+  <section class="kotak saran" aria-labelledby="saran-judul">
+    <h2 id="saran-judul">Saran minggu ini</h2>
+    <p id="saran-kosong" class="meta">Belum ada saran. Tekan tombol di bawah untuk memintanya.</p>
+    <div id="saran-isi" hidden>
+      <span id="saran-tingkat" class="chip"></span>
+      <p id="saran-ringkasan" class="saran-ringkasan"></p>
+      <ul id="saran-daftar"></ul>
+      <p id="saran-sumber" class="meta"></p>
+    </div>
+    <button class="tombol kecil" type="button" id="tombol-saran">Minta saran baru</button>
+    <p id="saran-batas" class="catatan"></p>
+    <p class="catatan">Saran umum dari program, bukan nasihat keuangan profesional.</p>
+  </section>
+
+  <!-- Pengingat mingguan (.ics) -->
+  <section class="kotak">
+    <h2>Pengingat mingguan</h2>
+    <p class="meta">Unduh file kalender yang berulang tiap minggu dan menaut ke form isi budget.</p>
+    <form id="form-pengingat">
+      <label for="pg-hari">Hari</label>
+      <select id="pg-hari">
+        <option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option>
+        <option value="4">Kamis</option><option value="5">Jumat</option><option value="6">Sabtu</option>
+        <option value="0">Minggu</option>
+      </select>
+      <label for="pg-jam">Jam</label>
+      <input type="time" id="pg-jam" value="19:00" required>
+      <button class="tombol" type="submit">Tambahkan pengingat mingguan</button>
+    </form>
+  </section>
+
+  <!-- Pengaturan koneksi: disimpan di browser ini saja, tidak ada di repo -->
+  <section class="kotak">
+    <details id="pengaturan">
+      <summary>Pengaturan koneksi</summary>
+      <form id="form-pengaturan" autocomplete="off">
+        <label for="p-url">Alamat API (URL web app Apps Script)</label>
+        <input type="text" id="p-url" placeholder="https://script.google.com/macros/s/.../exec">
+        <label for="p-kode">Kode akses</label>
+        <input type="password" id="p-kode" placeholder="isi untuk mengganti">
+        <button class="tombol kecil" type="submit">Simpan</button>
+      </form>
+    </details>
+  </section>
+
+</main>
+<script src="ics.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
