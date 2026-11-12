@@ -62,14 +62,14 @@ function parseNominal(teks) {
   // c) slang: goceng, ceban, ...
   if (punya(SLANG_NOMINAL, rapat)) return SLANG_NOMINAL[rapat];
 
-  // d) kata: "dua puluh ribu"
+ 
   return parseAngkaKata(t.split(/\s+/));
 }
 
 function parseAngkaKata(tokens) {
-  let total = 0;  // sudah "terkunci" (ribuan, jutaan)
-  let grup = 0;   // nilai di bawah 1000 yang sedang dirakit
-  let satuan = 0; // angka 1-9 terakhir yang menunggu pengali
+  let total = 0;  
+  let grup = 0;   
+  let satuan = 0; 
   for (const k of tokens) {
     if (punya(KATA_ANGKA, k)) satuan = KATA_ANGKA[k];
     else if (k === 'sepuluh') grup += 10;
@@ -82,13 +82,12 @@ function parseAngkaKata(tokens) {
     else if (k === 'ratus') { grup += (satuan || 1) * 100; satuan = 0; }
     else if (k === 'ribu') { total += (grup + satuan || 1) * 1000; grup = 0; satuan = 0; }
     else if (k === 'juta') { total += (grup + satuan || 1) * 1000000; grup = 0; satuan = 0; }
-    else return null; // ada kata yang tidak dikenal -> jangan menebak
+    else return null; 
   }
   return total + grup + satuan || null;
 }
 
-// ---------- 3. Tanggal relatif dihitung di KODE ----------
-// Hanya pola yang kita kenal yang diterima. Teks lain -> null (nanti bot bertanya).
+
 function resolveTanggal(kapan, hariIni) {
   const h = keHari(hariIni);
   const k = String(kapan === null || kapan === undefined ? '' : kapan).toLowerCase().trim();
