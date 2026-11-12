@@ -1,0 +1,4 @@
+.env
+Set-Content -Path .env.example -Value "# Contoh nama isian. Nilai asli diisi di Script Properties Apps Script, JANGAN di file mana pun di repo.","LLM_API_KEY=","LLM_MODEL=","KODE_AKSES="
+node_modules/
+.DS_Store
