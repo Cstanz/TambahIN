@@ -4,6 +4,7 @@
   --kuning: #FFD93D;
   --pink: #FF8FB1;
   --biru: #8FD3FF;
+  --hijau: #7ED957;
   --hitam: #000;
   --putih: #fff;
   --garis: 3px;
@@ -27,15 +28,17 @@ h2 { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.1; }
 .kotak { background: var(--putih); border: var(--garis) solid var(--hitam); box-shadow: var(--bayangan); padding: 16px; }
 
 /* ----- Kartu budget ----- */
-.budget { background: var(--kuning); }
+.budget { background: var(--putih); }
 .budget.minus { background: var(--pink); }
 .budget .label { font-family: var(--font-mono); font-size: 15px; }
 .budget .angka { font-size: clamp(48px, 17vw, 88px); font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin: 6px 0 14px; overflow-wrap: anywhere; }
 .bar { height: 36px; background: var(--putih); border: var(--garis) solid var(--hitam); }
-.bar > i { display: block; height: 100%; width: 0; background: var(--biru); border-right: var(--garis) solid var(--hitam); }
+.bar > i { display: block; height: 100%; width: 0; background: var(--hijau); border-right: var(--garis) solid var(--hitam); }
+.budget.minus .bar > i { background: var(--hitam); }
 .bar.kosong > i { border-right: 0; }
-.rincian { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; font-family: var(--font-mono); font-size: 14px; }
-.rincian:empty { display: none; }
+.budget .kecil { margin: 10px 0 0; font-weight: 700; }
+.budget .redup { margin: 6px 0 0; font-family: var(--font-mono); font-size: 14px; }
+.budget .redup:empty { display: none; }
 
 /* ----- Form ----- */
 form { display: grid; gap: 12px; }
@@ -72,8 +75,6 @@ input[type=radio] { width: 24px; height: 24px; margin: 0; accent-color: var(--hi
 .konfirmasi p { margin: 0 0 10px; }
 
 /* ----- Daftar transaksi ----- */
-.daftar { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 12px; }
-.daftar li { border: var(--garis) solid var(--hitam); padding: 12px; display: grid; gap: 8px; background: var(--krem); }
 .baris { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .nominal { font-size: 22px; font-weight: 700; }
 .nominal.masuk { background: var(--biru); padding: 0 6px; border: var(--garis) solid var(--hitam); }
@@ -91,6 +92,28 @@ input[type=radio] { width: 24px; height: 24px; margin: 0; accent-color: var(--hi
 .chip.tingkat-aman { background: var(--putih); }
 .chip.tingkat-waspada { background: var(--kuning); }
 .chip.tingkat-bahaya { background: var(--pink); }
+
+/* ----- Transaksi per hari ----- */
+.hari { margin: 18px 0 4px; font-family: var(--font-mono); font-size: 15px; }
+.hari:first-child { margin-top: 12px; }
+.baris-trx { list-style: none; margin: 0; padding: 0; }
+.trx { border-bottom: 1px solid #b8b8b8; }
+.trx:last-child { border-bottom: 0; }
+.trx-baris { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 6px 0; background: none; border: 0; color: var(--hitam); font: inherit; text-align: left; cursor: pointer; }
+.trx-teks { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.trx-nama { overflow-wrap: anywhere; }
+.trx .nominal { font-size: 18px; white-space: nowrap; }
+.trx .aksi { padding: 4px 0 10px; }
+.trx .form-ubah { padding: 8px 0; }
+
+/* ----- Bagian yang bisa dilipat ----- */
+details.lipat { padding: 0 16px; }
+details.lipat > summary { display: flex; align-items: center; justify-content: space-between; min-height: 56px; margin: 0; cursor: pointer; list-style: none; }
+details.lipat > summary::-webkit-details-marker { display: none; }
+details.lipat > summary::after { content: "+"; font-family: var(--font-mono); font-size: 24px; }
+details.lipat[open] > summary::after { content: "\2212"; }
+details.lipat[open] { padding-bottom: 16px; }
+details.lipat h3 { margin: 18px 0 4px; font-size: 18px; }
 
 /* ----- Pengaturan ----- */
 summary { font-weight: 700; cursor: pointer; min-height: 44px; display: flex; align-items: center; }

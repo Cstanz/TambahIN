@@ -23,7 +23,7 @@ function el(tag, props, ...anak) {
     else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
     else e.setAttribute(k, v);
   }
-  e.append(...anak); // string dijadikan node teks: aman dari injeksi HTML
+  e.append(...anak.filter((a) => a !== null && a !== undefined && a !== false)); // string dijadikan node teks: aman dari injeksi HTML
   return e;
 }
 
@@ -105,7 +105,7 @@ function isiBar(persen) {
   const p = Math.max(0, Math.min(100, persen));
   $('b-isi').style.width = p + '%';
   $('b-bar').classList.toggle('kosong', p === 0);
-  $('b-bar').setAttribute('aria-label', 'Sisa budget ' + Math.round(p) + ' persen');
+  $('b-bar').setAttribute('aria-label', 'Terpakai ' + Math.round(p) + ' persen');
 }
 
 // s = objek "sisa" dari server, atau null kalau belum terhubung
@@ -119,23 +119,24 @@ function renderBudget(s) {
     teks('b-label', s === null ? 'Belum terhubung ke server' : 'Belum ada budget aktif');
     teks('b-angka', '—');
     isiBar(0);
-    teks('b-jatah', '');
     teks('b-terpakai', '');
-    teks('b-asal', s === null ? 'Isi Pengaturan koneksi di bagian bawah.' : 'Isi budget lewat tombol di atas.');
+    teks('b-jatah', '');
+    teks('b-asal', s === null ? 'Buka "Pengingat dan koneksi" di bagian bawah untuk mengisi alamat API.' : 'Isi budget lewat tombol di atas.');
     return;
   }
 
   const dana = s.bawaan + s.budget + s.pemasukan_lain;
   const minus = s.sisa < 0;
+  const persenTerpakai = dana > 0 ? Math.round((s.pengeluaran * 100) / dana) : 0;
   kartu.classList.toggle('minus', minus);
 
-  teks('b-label', (minus ? 'Kelebihan budget, ' : 'Sisa budget, ') + rentang(s.minggu_mulai, s.akhir_rencana));
+  teks('b-label', minus ? 'Kelebihan budget minggu ini' : 'Sisa budget minggu ini');
   teks('b-angka', (minus ? '-' : '') + rupiah(s.sisa));
-  isiBar(minus || dana <= 0 ? 0 : (s.sisa / dana) * 100);
+  isiBar(minus ? 100 : persenTerpakai); // bar = bagian yang sudah terpakai
+  teks('b-terpakai', 'Terpakai ' + persenTerpakai + '% · sisa ' + s.hari_tersisa + ' hari');
   teks('b-jatah', 'Boleh dipakai hari ini: ' + rupiah(s.jatah_harian));
-  teks('b-terpakai', 'Terpakai: ' + rupiah(s.pengeluaran) + ' dari ' + rupiah(dana));
 
-  let asal = 'Budget ' + rupiah(s.budget) + ' + sisa minggu lalu ' + (s.bawaan < 0 ? '-' : '') + rupiah(s.bawaan);
+  let asal = rentang(s.minggu_mulai, s.akhir_rencana) + '. Budget ' + rupiah(s.budget) + ' + sisa minggu lalu ' + (s.bawaan < 0 ? '-' : '') + rupiah(s.bawaan);
   if (s.pemasukan_lain > 0) asal += ' + pemasukan lain ' + rupiah(s.pemasukan_lain);
   teks('b-asal', asal);
 }
@@ -173,25 +174,56 @@ function setTanggalDefault() {
 
 function renderDaftar(daftar) {
   daftarTerakhir = daftar;
-  const ul = $('daftar');
-  ul.replaceChildren();
+  const wadah = $('daftar');
+  wadah.replaceChildren();
   $('kosong').hidden = daftar.length > 0;
-  for (const t of daftar) ul.appendChild(barisTransaksi(t));
+
+  // Kelompokkan per tanggal. Daftar dari server sudah terurut: terbaru di atas.
+  let tanggalSaatIni = null;
+  let ul = null;
+  for (const t of daftar) {
+    if (t.tanggal !== tanggalSaatIni) {
+      tanggalSaatIni = t.tanggal;
+      wadah.appendChild(el('h3', { class: 'hari' }, labelHari(t.tanggal)));
+      ul = el('ul', { class: 'baris-trx' });
+      wadah.appendChild(ul);
+    }
+    ul.appendChild(barisTransaksi(t));
+  }
 }
 
+// LATIHAN (T4): sekarang hanya mengenali "Hari ini". Tambahkan "Kemarin" dengan caramu sendiri.
+// Petunjuk: tanggal kemarin = hari ini dikurangi 1 hari. Jangan mengurangi string 'YYYY-MM-DD';
+// pakai Date.UTC seperti di bagianTanggal() dan ics.js.
+function labelHari(iso) {
+  if (iso === hariIniLokal()) return 'Hari ini';
+  return tanggalPendek(iso);
+}
+
+// Satu baris ringkas. Ketuk barisnya untuk membuka tombol Ubah dan Hapus.
 function barisTransaksi(t) {
   const masuk = t.tipe === 'masuk';
-  return el('li', {},
-    el('div', { class: 'baris' },
-      el('span', { class: 'nominal' + (masuk ? ' masuk' : '') }, (masuk ? '+' : '') + rupiah(t.nominal)),
-      el('span', { class: 'chip' }, t.kategori)
-    ),
-    el('div', { class: 'meta' }, tanggalPendek(t.tanggal) + (t.catatan ? ', ' + t.catatan : '')),
-    el('div', { class: 'aksi' },
-      el('button', { class: 'tombol kecil', type: 'button', onclick: (ev) => bukaFormUbah(t, ev.currentTarget.closest('li')) }, 'Ubah'),
-      el('button', { class: 'tombol kecil pink', type: 'button', onclick: () => hapusTransaksi(t) }, 'Hapus')
-    )
+  const aksi = el('div', { class: 'aksi', hidden: '' },
+    el('button', { class: 'tombol kecil', type: 'button', onclick: (ev) => bukaFormUbah(t, ev.currentTarget.closest('li')) }, 'Ubah'),
+    el('button', { class: 'tombol kecil pink', type: 'button', onclick: () => hapusTransaksi(t) }, 'Hapus')
   );
+  const baris = el('button', {
+    class: 'trx-baris',
+    type: 'button',
+    'aria-expanded': 'false',
+    onclick: (ev) => {
+      const akanBuka = aksi.hidden;
+      aksi.hidden = !akanBuka;
+      ev.currentTarget.setAttribute('aria-expanded', String(akanBuka));
+    },
+  },
+    el('span', { class: 'trx-teks' },
+      el('span', { class: 'trx-nama' }, t.catatan || t.kategori),
+      t.catatan ? el('span', { class: 'chip' }, t.kategori) : null
+    ),
+    el('span', { class: 'nominal' + (masuk ? ' masuk' : '') }, (masuk ? '+' : '') + rupiah(t.nominal))
+  );
+  return el('li', { class: 'trx' }, baris, aksi);
 }
 
 // ---------- Aksi ----------

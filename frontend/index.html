@@ -23,14 +23,14 @@
   <section id="kartu-budget" class="kotak budget" aria-label="Sisa budget">
     <div class="label" id="b-label">Memuat...</div>
     <div class="angka" id="b-angka">Rp0</div>
-    <div class="bar" id="b-bar" role="img" aria-label="Sisa budget"><i id="b-isi"></i></div>
-    <div class="rincian"><span id="b-jatah"></span><span id="b-terpakai"></span></div>
-    <div class="rincian"><span id="b-asal"></span></div>
+    <div class="bar" id="b-bar" role="img" aria-label="Terpakai"><i id="b-isi"></i></div>
+    <p class="kecil" id="b-terpakai"></p>
+    <p class="redup" id="b-jatah"></p>
+    <p class="redup" id="b-asal"></p>
   </section>
 
   <!-- Isi budget -->
-  <section class="kotak">
-    <details id="isi-budget">
+  <details id="isi-budget" class="kotak lipat">
       <summary>Isi budget</summary>
       <form id="form-budget" autocomplete="off">
         <label for="bg-nominal">Nominal (contoh: 200rb)</label>
@@ -46,8 +46,7 @@
         </fieldset>
         <button class="tombol" type="submit" id="tombol-budget">Simpan budget</button>
       </form>
-    </details>
-  </section>
+  </details>
 
   <!-- Chat -->
   <section class="kotak">
@@ -62,14 +61,14 @@
 
   <!-- Daftar transaksi -->
   <section class="kotak">
-    <h2>Transaksi periode ini</h2>
+    <h2>Transaksi</h2>
     <p id="kosong" class="meta" hidden>Belum ada transaksi.</p>
-    <ul id="daftar" class="daftar"></ul>
+    <div id="daftar"></div>
   </section>
 
-  <!-- Saran minggu ini -->
-  <section class="kotak saran" aria-labelledby="saran-judul">
-    <h2 id="saran-judul">Saran minggu ini</h2>
+  <!-- Saran minggu ini (lipat) -->
+  <details id="saran-lipat" class="kotak lipat saran">
+    <summary>Saran minggu ini</summary>
     <p id="saran-kosong" class="meta">Belum ada saran. Tekan tombol di bawah untuk memintanya.</p>
     <div id="saran-isi" hidden>
       <span id="saran-tingkat" class="chip"></span>
@@ -80,11 +79,13 @@
     <button class="tombol kecil" type="button" id="tombol-saran">Minta saran baru</button>
     <p id="saran-batas" class="catatan"></p>
     <p class="catatan">Saran umum dari program, bukan nasihat keuangan profesional.</p>
-  </section>
+  </details>
 
-  <!-- Pengingat mingguan (.ics) -->
-  <section class="kotak">
-    <h2>Pengingat mingguan</h2>
+  <!-- Pengingat dan koneksi (lipat). Pengaturan koneksi disimpan di browser ini saja, tidak ada di repo -->
+  <details id="pengaturan" class="kotak lipat">
+    <summary>Pengingat dan koneksi</summary>
+
+    <h3>Pengingat mingguan</h3>
     <p class="meta">Unduh file kalender yang berulang tiap minggu dan menaut ke form isi budget.</p>
     <form id="form-pengingat">
       <label for="pg-hari">Hari</label>
@@ -97,21 +98,16 @@
       <input type="time" id="pg-jam" value="19:00" required>
       <button class="tombol" type="submit">Tambahkan pengingat mingguan</button>
     </form>
-  </section>
 
-  <!-- Pengaturan koneksi: disimpan di browser ini saja, tidak ada di repo -->
-  <section class="kotak">
-    <details id="pengaturan">
-      <summary>Pengaturan koneksi</summary>
-      <form id="form-pengaturan" autocomplete="off">
-        <label for="p-url">Alamat API (URL web app Apps Script)</label>
-        <input type="text" id="p-url" placeholder="https://script.google.com/macros/s/.../exec">
-        <label for="p-kode">Kode akses</label>
-        <input type="password" id="p-kode" placeholder="isi untuk mengganti">
-        <button class="tombol kecil" type="submit">Simpan</button>
-      </form>
-    </details>
-  </section>
+    <h3>Koneksi</h3>
+    <form id="form-pengaturan" autocomplete="off">
+      <label for="p-url">Alamat API (URL web app Apps Script)</label>
+      <input type="text" id="p-url" placeholder="https://script.google.com/macros/s/.../exec">
+      <label for="p-kode">Kode akses</label>
+      <input type="password" id="p-kode" placeholder="isi untuk mengganti">
+      <button class="tombol kecil" type="submit">Simpan</button>
+    </form>
+  </details>
 
 </main>
 <script src="ics.js" defer></script>
